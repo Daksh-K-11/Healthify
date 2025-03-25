@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:healthify/auth/pages/login.dart';
+import 'package:healthify/auth/service/login_service.dart';
 import 'package:healthify/core/constant.dart';
 import 'package:healthify/core/utils.dart';
 import 'package:http/http.dart' as http;
@@ -148,8 +148,6 @@ class _SummaryScreenState extends State<SummaryScreen>
       "exercise_hours": _summaryMapping['exercise_hours'] ?? "",
     };
 
-    print(requestData);
-
     try {
       final response = await http.post(
         Uri.parse('$baseUrl/auth/signup/'),
@@ -158,9 +156,9 @@ class _SummaryScreenState extends State<SummaryScreen>
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
+        await LoginService().login(widget.signupData["phone_number"]!,
+            widget.signupData["password"]!, context);
         showSnackBar(context, "Sign up successful", true);
-        Navigator.of(context)
-            .push(MaterialPageRoute(builder: (ctx) => const LoginPage()));
       } else {
         showSnackBar(context, "Sign up unsuccessful", false);
       }
@@ -279,7 +277,7 @@ class _SummaryScreenState extends State<SummaryScreen>
                   ),
                 ),
                 const SizedBox(height: 24),
-                // Finish button that calls the API
+
                 ElevatedButton(
                   onPressed: _isSubmitting ? null : _submitData,
                   style: ElevatedButton.styleFrom(
