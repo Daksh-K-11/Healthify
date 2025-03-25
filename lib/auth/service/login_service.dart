@@ -11,10 +11,6 @@ class LoginService {
       String phoneNumber, String password, BuildContext context) async {
     print("<><><><><><><><><><><><><><><><><><><><><>>");
     print("$baseUrl/auth/login/");
-    // print({
-    //       "phone_number": phoneNumber,
-    //       "password": password,
-    //     },)
     final response = await http.post(
       Uri.parse("$baseUrl/auth/login/"),
       headers: {

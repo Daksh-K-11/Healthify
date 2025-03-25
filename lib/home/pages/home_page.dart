@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:healthify/home/models/carousel_data.dart';
 import 'package:healthify/home/widgets/carousel_item.dart';
+import 'package:healthify/home/widgets/track.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -44,24 +45,27 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(10),
-      child: Column(
-        children: [
-          SizedBox(
-            height: 200,
-            child: PageView.builder(
-              controller: _pageController,
-              itemCount: carouselData.length,
-              itemBuilder: (context, index) {
-                final data = carouselData[index];
-                return CarouselItem(
-                  title: data["title"]!,
-                  description: data["description"]!,
-                  imagePath: data["image"]!,
-                );
-              },
+      child: SingleChildScrollView(
+        child: Column(
+          children: [
+            SizedBox(
+              height: 200,
+              child: PageView.builder(
+                controller: _pageController,
+                itemCount: carouselData.length,
+                itemBuilder: (context, index) {
+                  final data = carouselData[index];
+                  return CarouselItem(
+                    title: data["title"]!,
+                    description: data["description"]!,
+                    imagePath: data["image"]!,
+                  );
+                },
+              ),
             ),
-          ),
-        ],
+            const TrackPage(),
+          ],
+        ),
       ),
     );
   }

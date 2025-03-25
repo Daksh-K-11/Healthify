@@ -33,14 +33,15 @@ class _ChatBotPageState extends ConsumerState<ChatBotPage> {
     final messages = ref.watch(chatProvider);
     return Column(
       children: [
-        // Show FAQs only when there are no messages yet.
         if (messages.isEmpty)
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Faqs(
-              onFaqSelected: (faq) {
-                _sendMessage(faq);
-              },
+          FadeInDown(
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Faqs(
+                onFaqSelected: (faq) {
+                  _sendMessage(faq);
+                },
+              ),
             ),
           ),
         Expanded(
