@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:healthify/core/theme/pallete.dart';
 import 'package:markdown/markdown.dart' as md;
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
@@ -25,10 +26,23 @@ void showEvaluationBottomSheet(String report, BuildContext context) {
               ),
             ),
             ElevatedButton.icon(
+              style: ElevatedButton.styleFrom().copyWith(
+                foregroundColor: WidgetStateProperty.all(Pallete.borderColor),
+                backgroundColor: WidgetStateProperty.all(Pallete.gradient3),
+                shape: WidgetStateProperty.all(
+                  RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                    side: const BorderSide(
+                      color: Pallete.borderColor,
+                      width: 1,
+                    ),
+                  ),
+                ),
+              ),
               onPressed: () async {
                 await _downloadPdf(report);
               },
-              icon: const Icon(Icons.download),
+              icon: const Icon(Icons.picture_as_pdf),
               label: const Text("Download PDF"),
             ),
           ],
@@ -55,8 +69,6 @@ final healthReportProvider = FutureProvider<String>((ref) async {
     return "Error: $e";
   }
 });
-
-
 
 Future<void> _downloadPdf(String report) async {
   final pdf = pw.Document();

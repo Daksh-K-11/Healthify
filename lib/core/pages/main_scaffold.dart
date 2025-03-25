@@ -1,4 +1,5 @@
 // import 'dart:convert';
+import 'package:animate_do/animate_do.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -74,16 +75,19 @@ class _MainScaffoldState extends State<MainScaffold> {
           Positioned(
             top: 600,
             left: 320,
-            child: FloatingActionButton(
-              backgroundColor: Pallete.gradient3,
-              foregroundColor: Pallete.borderColor,
-              onPressed: () async {
-                final container = ProviderScope.containerOf(context);
-                final report =
-                    await container.read(healthReportProvider.future);
-                showEvaluationBottomSheet(report, context);
-              },
-              child: const Icon(CupertinoIcons.chart_bar_alt_fill),
+            child: FadeIn(
+              duration: const Duration(milliseconds: 400),
+              child: FloatingActionButton(
+                backgroundColor: Pallete.gradient3,
+                foregroundColor: Pallete.borderColor,
+                onPressed: () async {
+                  final container = ProviderScope.containerOf(context);
+                  final report =
+                      await container.read(healthReportProvider.future);
+                  showEvaluationBottomSheet(report, context);
+                },
+                child: const Icon(CupertinoIcons.chart_bar_alt_fill),
+              ),
             ),
           ),
       ],

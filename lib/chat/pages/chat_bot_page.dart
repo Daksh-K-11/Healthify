@@ -1,92 +1,18 @@
-// import 'dart:convert';
 // import 'package:flutter/material.dart';
-// import 'package:healthify/core/constant.dart';
+// import 'package:flutter_riverpod/flutter_riverpod.dart';
+// import 'package:healthify/chat/providers/chat_providers.dart';
+// import 'package:healthify/chat/widget/chat_bubble.dart';
 // import 'package:healthify/core/theme/pallete.dart';
-// import 'package:http/http.dart' as http;
 
-// class ChatMessage {
-//   final String message;
-//   final bool isUser;
-//   ChatMessage({required this.message, required this.isUser});
-// }
-
-// class ChatBubble extends StatelessWidget {
-//   final String message;
-//   final bool isUser;
-//   const ChatBubble({super.key, required this.message, required this.isUser});
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Align(
-//       alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
-//       child: Container(
-//         margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-//         padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 14),
-//         constraints: BoxConstraints(
-//           maxWidth: MediaQuery.of(context).size.width * 0.75,
-//         ),
-//         decoration: BoxDecoration(
-//           color: isUser ? Pallete.gradient1 : Pallete.cardColor,
-//           borderRadius: BorderRadius.only(
-//             topLeft: const Radius.circular(15),
-//             topRight: const Radius.circular(15),
-//             bottomLeft:
-//                 isUser ? const Radius.circular(15) : const Radius.circular(0),
-//             bottomRight:
-//                 isUser ? const Radius.circular(0) : const Radius.circular(15),
-//           ),
-//         ),
-//         child: Text(
-//           message,
-//           style: const TextStyle(color: Pallete.whiteColor),
-//         ),
-//       ),
-//     );
-//   }
-// }
-
-// class ChatBotPage extends StatefulWidget {
+// class ChatBotPage extends ConsumerStatefulWidget {
 //   const ChatBotPage({super.key});
 
 //   @override
-//   State<ChatBotPage> createState() => _ChatBotPageState();
+//   ConsumerState<ChatBotPage> createState() => _ChatBotPageState();
 // }
 
-// class _ChatBotPageState extends State<ChatBotPage> {
-//   final List<ChatMessage> _messages = [];
+// class _ChatBotPageState extends ConsumerState<ChatBotPage> {
 //   final TextEditingController _controller = TextEditingController();
-
-//   Future<void> _sendMessage(String question) async {
-//     setState(() {
-//       _messages.add(ChatMessage(message: question, isUser: true));
-//     });
-
-//     final url = Uri.parse("$baseUrl/auth/health-chat/");
-//     try {
-//       final response = await http.post(
-//         url,
-//         headers: headersForAuth,
-//         body: jsonEncode({"question": question}),
-//       );
-
-//       if (response.statusCode == 200) {
-//         final data = jsonDecode(response.body);
-//         final answer = data['health_report'] ?? "No answer available.";
-//         setState(() {
-//           _messages.add(ChatMessage(message: answer, isUser: false));
-//         });
-//       } else {
-//         setState(() {
-//           _messages.add(ChatMessage(
-//               message: "Error: ${response.statusCode}", isUser: false));
-//         });
-//       }
-//     } catch (e) {
-//       setState(() {
-//         _messages.add(ChatMessage(message: "Error: $e", isUser: false));
-//       });
-//     }
-//   }
 
 //   @override
 //   void dispose() {
@@ -94,19 +20,23 @@
 //     super.dispose();
 //   }
 
+//   Future<void> _sendMessage(String text) async {
+//     if (text.trim().isEmpty) return;
+//     await ref.read(chatProvider.notifier).sendMessage(text.trim());
+//     _controller.clear();
+//   }
+
 //   @override
 //   Widget build(BuildContext context) {
+//     final messages = ref.watch(chatProvider);
 //     return Column(
 //       children: [
 //         Expanded(
 //           child: ListView.builder(
 //             padding: const EdgeInsets.all(8),
-//             itemCount: _messages.length,
+//             itemCount: messages.length,
 //             itemBuilder: (context, index) {
-//               return ChatBubble(
-//                 message: _messages[index].message,
-//                 isUser: _messages[index].isUser,
-//               );
+//               return ChatBubble(chatMessage: messages[index]);
 //             },
 //           ),
 //         ),
@@ -127,12 +57,7 @@
 //                       horizontal: 20,
 //                     ),
 //                   ),
-//                   onSubmitted: (text) {
-//                     if (text.trim().isNotEmpty) {
-//                       _sendMessage(text.trim());
-//                       _controller.clear();
-//                     }
-//                   },
+//                   onSubmitted: (text) => _sendMessage(text),
 //                 ),
 //               ),
 //               const SizedBox(width: 8),
@@ -140,13 +65,7 @@
 //                 backgroundColor: Pallete.gradient1,
 //                 child: IconButton(
 //                   icon: const Icon(Icons.send, color: Colors.white),
-//                   onPressed: () {
-//                     final text = _controller.text.trim();
-//                     if (text.isNotEmpty) {
-//                       _sendMessage(text);
-//                       _controller.clear();
-//                     }
-//                   },
+//                   onPressed: () => _sendMessage(_controller.text),
 //                 ),
 //               ),
 //             ],
@@ -157,6 +76,7 @@
 //   }
 // }
 
+import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:healthify/chat/providers/chat_providers.dart';
@@ -203,31 +123,33 @@ class _ChatBotPageState extends ConsumerState<ChatBotPage> {
         Container(
           color: Theme.of(context).cardColor,
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-          child: Row(
-            children: [
-              Expanded(
-                child: TextField(
-                  controller: _controller,
-                  decoration: const InputDecoration(
-                    hintText: "Ask a question...",
-                    border: InputBorder.none,
-                    contentPadding: EdgeInsets.symmetric(
-                      vertical: 15,
-                      horizontal: 20,
+          child: FadeInUp(
+            child: Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _controller,
+                    decoration: const InputDecoration(
+                      hintText: "Ask a question...",
+                      border: InputBorder.none,
+                      contentPadding: EdgeInsets.symmetric(
+                        vertical: 15,
+                        horizontal: 20,
+                      ),
                     ),
+                    onSubmitted: (text) => _sendMessage(text),
                   ),
-                  onSubmitted: (text) => _sendMessage(text),
                 ),
-              ),
-              const SizedBox(width: 8),
-              CircleAvatar(
-                backgroundColor: Pallete.gradient1,
-                child: IconButton(
-                  icon: const Icon(Icons.send, color: Colors.white),
-                  onPressed: () => _sendMessage(_controller.text),
+                const SizedBox(width: 8),
+                CircleAvatar(
+                  backgroundColor: Pallete.gradient1,
+                  child: IconButton(
+                    icon: const Icon(Icons.send, color: Colors.white),
+                    onPressed: () => _sendMessage(_controller.text),
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ],
