@@ -66,7 +66,7 @@ class TrackService {
   Future<DailyConsumption> recordConsumption(
       int trackItemId, String date, int units) async {
     final response = await http.post(
-      Uri.parse('${baseUrl}track/daily-consumption/'),
+      Uri.parse('$baseUrl/track/daily-consumption/'),
       headers: headersForAuth,
       body: json.encode({
         'track_item': trackItemId,

@@ -41,7 +41,7 @@ class _MainScaffoldState extends State<MainScaffold> {
             centerTitle: true,
             title: Text(
               title[_currentIndex],
-              style: const TextStyle(color: Pallete.whiteColor),
+              style: const TextStyle(color: Colors.black),
             ),
             backgroundColor: Pallete.gradient1,
           ),

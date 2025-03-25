@@ -7,7 +7,8 @@ class Pallete {
   static const inactiveBottomBarItemColor = Color(0xffababab);
 
   static const Color backgroundColor = Color.fromRGBO(18, 18, 18, 1);
-  static const Color gradient1 = Color.fromRGBO(19, 177, 11, 1);
+  // static const Color gradient1 = Color.fromRGBO(19, 177, 11, 1);
+  static const Color gradient1 = Color.fromRGBO(148, 230, 239, 1);
   static const Color gradient2 = Color.fromRGBO(22, 148, 15, 1);
   static const Color gradient3 = Color.fromRGBO(78, 225, 93, 1);
   static const Color borderColor = Color.fromRGBO(52, 51, 67, 1);

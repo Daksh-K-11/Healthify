@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:healthify/core/theme/pallete.dart';
 import 'package:healthify/home/providers/track_provider.dart';
 import 'package:intl/intl.dart';
 import 'package:healthify/home/models/track_item.dart';
@@ -20,6 +21,9 @@ class _TrackState extends ConsumerState<Track>
   int? _expandedIndex;
   final TextEditingController _unitsController = TextEditingController();
 
+  bool _showAddTile = false;
+  final TextEditingController _addTrackController = TextEditingController();
+
   @override
   void initState() {
     super.initState();
@@ -35,7 +39,7 @@ class _TrackState extends ConsumerState<Track>
     );
     _animationController.forward();
 
-    // Fetch data when widget initializes
+    // Fetch data when widget initializes.
     Future.microtask(() {
       ref.read(trackItemsProvider.notifier).fetchTrackItems();
       ref.read(dailyConsumptionProvider.notifier).fetchDailyConsumption();
@@ -46,6 +50,7 @@ class _TrackState extends ConsumerState<Track>
   void dispose() {
     _animationController.dispose();
     _unitsController.dispose();
+    _addTrackController.dispose();
     super.dispose();
   }
 
@@ -59,6 +64,7 @@ class _TrackState extends ConsumerState<Track>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Header Row with title and add button.
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 16.0),
             child: Row(
@@ -74,8 +80,11 @@ class _TrackState extends ConsumerState<Track>
               ],
             ),
           ),
+          // Use trackItems.when to build list or show a loading/error state.
           trackItems.when(
-            data: (items) => _buildTrackList(items, weeklyData),
+            data: (items) {
+              return _buildTrackList(items, weeklyData);
+            },
             loading: () => const Center(
               child: CircularProgressIndicator(),
             ),
@@ -91,94 +100,33 @@ class _TrackState extends ConsumerState<Track>
   Widget _buildAddTrackButton() {
     return Hero(
       tag: 'add_track_button',
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: () => _showAddTrackDialog(),
-          borderRadius: BorderRadius.circular(50),
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.primary,
-              borderRadius: BorderRadius.circular(50),
-              boxShadow: [
-                BoxShadow(
-                  color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
-                  blurRadius: 8,
-                  offset: const Offset(0, 4),
-                ),
-              ],
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  Icons.add,
-                  color: Theme.of(context).colorScheme.onPrimary,
-                  size: 18,
-                ),
-                const SizedBox(width: 4),
-                Text(
-                  'Add New',
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.onPrimary,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
-          ),
+      child: TextButton.icon(
+        style: TextButton.styleFrom().copyWith(
+          foregroundColor: MaterialStateProperty.all(
+              Pallete.gradient1), // Use MaterialStateProperty.
         ),
+        onPressed: () {
+          setState(() {
+            _showAddTile = true;
+          });
+        },
+        label: const Text('Add New'),
+        icon: const Icon(Icons.add_box_outlined),
       ),
     );
   }
 
   Widget _buildTrackList(
       List<TrackItem> items, AsyncValue<List<DailyConsumption>> weeklyData) {
-    if (items.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const SizedBox(height: 40),
-            Icon(
-              Icons.track_changes,
-              size: 80,
-              color: Theme.of(context).colorScheme.primary.withOpacity(0.5),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'No habits to track yet',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    color: Theme.of(context)
-                        .colorScheme
-                        .onSurface
-                        .withOpacity(0.7),
-                  ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Add a new habit to start tracking',
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Theme.of(context)
-                        .colorScheme
-                        .onSurface
-                        .withOpacity(0.5),
-                  ),
-            ),
-          ],
-        ),
-      );
+    final List<Widget> children = [];
+    if (_showAddTile) {
+      children.add(_buildAddTrackTile());
     }
 
-    return ListView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      itemCount: items.length,
-      itemBuilder: (context, index) {
-        final item = items[index];
+    children.addAll(
+      items.map((item) {
+        final index = items.indexOf(item);
         final isExpanded = _expandedIndex == index;
-
         return AnimatedContainer(
           duration: const Duration(milliseconds: 300),
           margin: const EdgeInsets.only(bottom: 16),
@@ -272,7 +220,73 @@ class _TrackState extends ConsumerState<Track>
             ),
           ),
         );
-      },
+      }).toList(),
+    );
+    return ListView(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      children: children,
+    );
+  }
+
+  Widget _buildAddTrackTile() {
+    return Card(
+      margin: const EdgeInsets.only(bottom: 16),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
+      elevation: 4,
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: _addTrackController,
+              decoration: const InputDecoration(
+                hintText: 'e.g., Cigarettes, Water, Steps',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                TextButton(
+                  onPressed: () {
+                    _addTrackController.clear();
+                    setState(() {
+                      _showAddTile = false;
+                    });
+                  },
+                  style: TextButton.styleFrom().copyWith(
+                    foregroundColor: WidgetStateProperty.all(Pallete.gradient1),
+                  ),
+                  child: const Text('Cancel'),
+                ),
+                const SizedBox(width: 8),
+                FilledButton(
+                  onPressed: () {
+                    if (_addTrackController.text.trim().isNotEmpty) {
+                      ref
+                          .read(trackItemsProvider.notifier)
+                          .addTrackItem(_addTrackController.text.trim());
+                      _addTrackController.clear();
+                      setState(() {
+                        _showAddTile = false;
+                      });
+                    }
+                  },
+                  style: FilledButton.styleFrom().copyWith(
+                    backgroundColor: WidgetStateProperty.all(Pallete.gradient1),
+                  ),
+                  child: const Text('Save'),
+                ),
+              ],
+            )
+          ],
+        ),
+      ),
     );
   }
 
@@ -313,7 +327,7 @@ class _TrackState extends ConsumerState<Track>
         }
       },
       loading: () => const Text('Loading...'),
-      error: (_, __) => const Text('Error loading data'),
+      error: (_, __) => Text('Error loading data: ${_.toString()}'),
     );
   }
 
@@ -325,9 +339,9 @@ class _TrackState extends ConsumerState<Track>
           color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
           borderRadius: BorderRadius.circular(8),
         ),
-        child: Icon(
+        child: const Icon(
           Icons.add,
-          color: Theme.of(context).colorScheme.primary,
+          color: Pallete.gradient1,
           size: 16,
         ),
       ),
@@ -355,10 +369,10 @@ class _TrackState extends ConsumerState<Track>
           );
         }
 
-        // Sort data by date
+        // Sort data by date.
         filteredData.sort((a, b) => a.date.compareTo(b.date));
 
-        // Create spots for the chart
+        // Create spots for the chart.
         final spots = filteredData.asMap().entries.map((entry) {
           final index = entry.key.toDouble();
           final item = entry.value;
@@ -539,39 +553,21 @@ class _TrackState extends ConsumerState<Track>
     );
   }
 
-  void _showAddTrackDialog() {
-    final TextEditingController nameController = TextEditingController();
+  void _recordConsumption(int trackItemId) {
+    if (_unitsController.text.isEmpty) return;
 
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Add New Habit to Track'),
-        content: TextField(
-          controller: nameController,
-          decoration: const InputDecoration(
-            labelText: 'Habit Name',
-            hintText: 'e.g., Cigarettes, Water, Steps',
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              if (nameController.text.isNotEmpty) {
-                ref
-                    .read(trackItemsProvider.notifier)
-                    .addTrackItem(nameController.text);
-                Navigator.pop(context);
-              }
-            },
-            child: const Text('Add'),
-          ),
-        ],
-      ),
-    ).then((_) => nameController.dispose());
+    final units = int.tryParse(_unitsController.text);
+    if (units == null) return;
+
+    final today = DateFormat('yyyy-MM-dd').format(DateTime.now());
+
+    ref.read(dailyConsumptionProvider.notifier).recordConsumption(
+          trackItemId,
+          today,
+          units,
+        );
+
+    _unitsController.clear();
   }
 
   void _quickAddUnit(TrackItem item) {
@@ -595,28 +591,10 @@ class _TrackState extends ConsumerState<Track>
       currentUnits = todayConsumption.units ?? 0;
     }
 
-    // Increment by 1
     ref.read(dailyConsumptionProvider.notifier).recordConsumption(
           item.id,
           today,
           currentUnits + 1,
         );
-  }
-
-  void _recordConsumption(int trackItemId) {
-    if (_unitsController.text.isEmpty) return;
-
-    final units = int.tryParse(_unitsController.text);
-    if (units == null) return;
-
-    final today = DateFormat('yyyy-MM-dd').format(DateTime.now());
-
-    ref.read(dailyConsumptionProvider.notifier).recordConsumption(
-          trackItemId,
-          today,
-          units,
-        );
-
-    _unitsController.clear();
   }
 }
