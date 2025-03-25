@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:healthify/auth/service/login_service.dart';
 import 'package:healthify/auth/widgets/auth_gradient_button.dart';
 import 'package:healthify/core/pages/main_scaffold.dart';
 import 'package:healthify/core/widgets/custom_field.dart';
@@ -24,7 +25,6 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     emailController.dispose();
     passwordController.dispose();
     super.dispose();
-    formKey.currentState!.validate();
   }
 
   @override
@@ -63,7 +63,9 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                   AuthGradientButton(
                     buttonText: 'Sign In',
                     onTap: () async {
-                      if (formKey.currentState!.validate()) {
+                      if (formKey.currentState!.validate()){
+                        await LoginService().login(emailController.text,
+                            passwordController.text, context);
                         Navigator.of(context).pushReplacement(MaterialPageRoute(
                             builder: (ctx) => const MainScaffold()));
                       } else {

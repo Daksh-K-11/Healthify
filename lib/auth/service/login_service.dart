@@ -9,8 +9,17 @@ import 'package:http/http.dart' as http;
 class LoginService {
   Future<void> login(
       String phoneNumber, String password, BuildContext context) async {
+    print("<><><><><><><><><><><><><><><><><><><><><>>");
+    print("$baseUrl/auth/login/");
+    // print({
+    //       "phone_number": phoneNumber,
+    //       "password": password,
+    //     },)
     final response = await http.post(
       Uri.parse("$baseUrl/auth/login/"),
+      headers: {
+        "Content-Type": "application/json",
+      },
       body: jsonEncode(
         {
           "phone_number": phoneNumber,
@@ -18,14 +27,16 @@ class LoginService {
         },
       ),
     );
-
-    if (response.statusCode != 201) {
+    if (response.statusCode > 250)  {
       showSnackBar(context, 'Login unsuccessful', false);
     }
 
     final data = jsonDecode(response.body);
-    Navigator.of(context)
-        .pushReplacement(MaterialPageRoute(builder: (ctx) => const MainScaffold()));
     bearerToken = data['token'];
+    
+    if (context.mounted) {
+      Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (ctx) => const MainScaffold()));
+    }
   }
 }

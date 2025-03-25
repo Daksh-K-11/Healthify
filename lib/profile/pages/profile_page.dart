@@ -16,12 +16,8 @@ class ProfilePage extends ConsumerWidget {
         body: profileAsync.when(
       data: (profile) => ProfileContent(profile: profile),
       loading: () => const Center(child: CircularProgressIndicator()),
-      error: (err, stack) => const Center(child: Text('Error loading profile')),
+      error: (err, stack) => Center(child: Text('Error loading profile: ${err.toString()}')),
     ));
-
-    // return Container(
-    //   child: Text('Profile'),
-    // );
   }
 }
 
