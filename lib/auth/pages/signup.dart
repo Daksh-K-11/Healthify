@@ -5,7 +5,7 @@ import 'package:healthify/core/widgets/custom_field.dart';
 import 'package:healthify/auth/pages/login.dart';
 import 'package:healthify/core/theme/pallete.dart';
 import 'package:healthify/core/utils.dart';
-import 'package:healthify/profile/pages/questionarre_screen.dart';
+import 'package:healthify/question/pages/questionarre_screen.dart';
 
 class SignupPage extends ConsumerStatefulWidget {
   const SignupPage({super.key});

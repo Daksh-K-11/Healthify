@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:healthify/core/theme/pallete.dart';
-import 'package:healthify/profile/models/question_model.dart';
-import 'package:healthify/profile/widgets/answer_options.dart';
-import 'package:healthify/profile/widgets/multi_select_options.dart';
-import 'package:healthify/profile/widgets/summary_screen.dart';
+import 'package:healthify/question/models/question_model.dart';
+import 'package:healthify/question/widgets/answer_options.dart';
+import 'package:healthify/question/widgets/multi_select_options.dart';
+import 'package:healthify/question/widgets/summary_screen.dart';
 
 class QuestionnaireScreen extends StatefulWidget {
   final Map<String, String> signupData;
