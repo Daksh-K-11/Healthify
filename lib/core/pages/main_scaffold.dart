@@ -14,12 +14,18 @@ class MainScaffold extends StatefulWidget {
 class _MainScaffoldState extends State<MainScaffold> {
   int _currentIndex = 0;
 
-  List<Widget> content = [const ChatBotPage() ,const ProfilePage()];
+  List<Widget> content = [const ChatBotPage(), const ProfilePage()];
+  List<String> title = ["Ask AI", "Profile"];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        centerTitle: true,
+        title: Text(
+          title[_currentIndex],
+          style: const TextStyle(color: Pallete.whiteColor),
+        ),
         backgroundColor: Pallete.gradient1,
       ),
       body: content[_currentIndex],
