@@ -25,7 +25,7 @@ class LoginService {
 
     final data = jsonDecode(response.body);
     Navigator.of(context)
-        .push(MaterialPageRoute(builder: (ctx) => const MainScaffold()));
+        .pushReplacement(MaterialPageRoute(builder: (ctx) => const MainScaffold()));
     bearerToken = data['token'];
   }
 }

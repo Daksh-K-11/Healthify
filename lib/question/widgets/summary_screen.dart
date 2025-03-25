@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:healthify/auth/pages/login.dart';
-import 'package:healthify/auth/service/login_service.dart';
 import 'package:healthify/core/constant.dart';
 import 'package:healthify/core/utils.dart';
 import 'package:http/http.dart' as http;
