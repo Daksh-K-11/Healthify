@@ -31,7 +31,7 @@ class ProfileContent extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        const SizedBox(height: 80),
+        const SizedBox(height: 40),
         BounceInDown(
           child: CircleAvatar(
             radius: 60,

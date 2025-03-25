@@ -130,7 +130,6 @@ class _SummaryScreenState extends State<SummaryScreen>
       _summaryMapping = mapping;
     });
 
-    print("Summary Mapping: $_summaryMapping");
   }
 
   Future<void> _submitData() async {
