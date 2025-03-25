@@ -77,6 +77,7 @@ class _MainScaffoldState extends State<MainScaffold> {
             left: 320,
             child: FadeIn(
               duration: const Duration(milliseconds: 400),
+              delay: const Duration(milliseconds: 200),
               child: FloatingActionButton(
                 backgroundColor: Pallete.gradient3,
                 foregroundColor: Pallete.borderColor,

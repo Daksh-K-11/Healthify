@@ -1,7 +1,7 @@
-import 'package:flutter/cupertino.dart';
+import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:healthify/core/theme/pallete.dart';
+import 'package:healthify/home/models/carousel_data.dart';
+import 'package:healthify/home/widgets/carousel_item.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -11,35 +11,54 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  final PageController _pageController = PageController();
+  int _currentPage = 0;
+  Timer? _autoScrollTimer;
+
+  @override
+  void initState() {
+    super.initState();
+    _autoScrollTimer = Timer.periodic(const Duration(seconds: 5), (timer) {
+      if (_pageController.hasClients) {
+        _currentPage++;
+        if (_currentPage >= carouselData.length) {
+          _currentPage = 0;
+        }
+        _pageController.animateToPage(
+          _currentPage,
+          duration: const Duration(milliseconds: 500),
+          curve: Curves.easeInOut,
+        );
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _autoScrollTimer?.cancel();
+    _pageController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(10),
       child: Column(
         children: [
-          Container(
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(5),
-              border: Border.all(color: Pallete.borderColor, width: 5),
-            ),
-            child: const Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  "Generate Report",
-                  style: TextStyle(
-                    fontSize: 25,
-                    fontWeight: FontWeight.w400,
-                    color: Pallete.gradient1,
-                  ),
-                ),
-                Icon(
-                  CupertinoIcons.chart_bar_alt_fill,
-                  color: Pallete.gradient1,
-                  size: 40,
-                ),
-              ],
+          SizedBox(
+            height: 200,
+            child: PageView.builder(
+              controller: _pageController,
+              itemCount: carouselData.length,
+              itemBuilder: (context, index) {
+                final data = carouselData[index];
+                return CarouselItem(
+                  title: data["title"]!,
+                  description: data["description"]!,
+                  imagePath: data["image"]!,
+                );
+              },
             ),
           ),
         ],
