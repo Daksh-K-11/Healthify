@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:healthify/auth/widgets/auth_gradient_button.dart';
+import 'package:healthify/core/pages/main_scaffold.dart';
 import 'package:healthify/core/widgets/custom_field.dart';
 import 'package:healthify/auth/pages/signup.dart';
 import 'package:healthify/core/theme/pallete.dart';
@@ -48,8 +49,9 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                   ),
                   const SizedBox(height: 30),
                   CustomField(
-                    hintText: 'Email',
+                    hintText: 'Phone Number',
                     controller: emailController,
+                    keyBoardType: TextInputType.phone,
                   ),
                   const SizedBox(height: 15),
                   CustomField(
@@ -62,6 +64,8 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                     buttonText: 'Sign In',
                     onTap: () async {
                       if (formKey.currentState!.validate()) {
+                        Navigator.of(context).pushReplacement(MaterialPageRoute(
+                            builder: (ctx) => const MainScaffold()));
                       } else {
                         showSnackBar(context, 'Missing fields!', false);
                       }
@@ -83,7 +87,6 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                           TextSpan(
                             text: 'Sign Up',
                             style: TextStyle(
-                              // color: Pallete.gradient2,
                               color: Pallete.gradient1,
                               fontWeight: FontWeight.bold,
                             ),

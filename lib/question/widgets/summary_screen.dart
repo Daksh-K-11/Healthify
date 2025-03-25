@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:healthify/core/constant.dart';
 import 'package:healthify/core/utils.dart';
 import 'package:http/http.dart' as http;
 import 'package:healthify/core/theme/pallete.dart';
@@ -150,7 +151,7 @@ class _SummaryScreenState extends State<SummaryScreen>
 
     try {
       final response = await http.post(
-        Uri.parse('/auth/signup/'),
+        Uri.parse('$baseUrl/auth/signup/'),
         headers: {"Content-Type": "application/json"},
         body: jsonEncode(requestData),
       );
