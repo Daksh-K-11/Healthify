@@ -73,7 +73,6 @@ final healthReportProvider = FutureProvider<String>((ref) async {
 Future<void> _downloadPdf(String report) async {
   final pdf = pw.Document();
 
-  final plainTextReport = md.markdownToHtml(report);
   final document = md.Document();
   final nodes = document.parseInline(report);
   final plainText = nodes.map((e) => e.textContent).join(' ');

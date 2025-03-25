@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:healthify/chat/providers/chat_providers.dart';
 import 'package:healthify/chat/widget/chat_bubble.dart';
 import 'package:healthify/core/theme/pallete.dart';
+import 'package:healthify/chat/widget/faqs.dart';
 
 class ChatBotPage extends ConsumerStatefulWidget {
   const ChatBotPage({super.key});
@@ -32,6 +33,16 @@ class _ChatBotPageState extends ConsumerState<ChatBotPage> {
     final messages = ref.watch(chatProvider);
     return Column(
       children: [
+        // Show FAQs only when there are no messages yet.
+        if (messages.isEmpty)
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Faqs(
+              onFaqSelected: (faq) {
+                _sendMessage(faq);
+              },
+            ),
+          ),
         Expanded(
           child: ListView.builder(
             padding: const EdgeInsets.all(8),
