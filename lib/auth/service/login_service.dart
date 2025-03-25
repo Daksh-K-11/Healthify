@@ -7,10 +7,10 @@ import 'package:healthify/core/utils.dart';
 import 'package:http/http.dart' as http;
 
 class LoginService {
-  Future<String?> login(
+  Future<void> login(
       String phoneNumber, String password, BuildContext context) async {
     final response = await http.post(
-      Uri.parse("$baseUrl/auth/login"),
+      Uri.parse("$baseUrl/auth/login/"),
       body: jsonEncode(
         {
           "phone_number": phoneNumber,
@@ -20,12 +20,12 @@ class LoginService {
     );
 
     if (response.statusCode != 201) {
-      showSnackBar(context, 'Login unsuccussful', false);
-      return null;
+      showSnackBar(context, 'Login unsuccessful', false);
     }
 
     final data = jsonDecode(response.body);
-    Navigator.of(context).push(MaterialPageRoute(builder: (ctx) => const MainScaffold()));
-    return data['token'];
+    Navigator.of(context)
+        .push(MaterialPageRoute(builder: (ctx) => const MainScaffold()));
+    bearerToken = data['token'];
   }
 }

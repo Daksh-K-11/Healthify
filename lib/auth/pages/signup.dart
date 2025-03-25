@@ -185,37 +185,22 @@ class _SignupPageState extends ConsumerState<SignupPage> {
                     controller: cityController,
                   ),
                   const SizedBox(height: 20),
-                  // AuthGradientButton(
-                  //   buttonText: 'Sign Up',
-                  //   onTap: () async {
-                  //     // if (formKey.currentState!.validate()) {
-                  //     Navigator.push(
-                  //         context,
-                  //         MaterialPageRoute(
-                  //             builder: (ctx) => const QuestionnaireScreen()));
-                  //     // } else {
-                  //     //   showSnackBar(context, 'Missing fields!', false);
-                  //     // }
-                  //   },
-                  // ),
                   AuthGradientButton(
                     buttonText: 'Sign Up',
                     onTap: () async {
                       if (formKey.currentState!.validate()) {
-                        // Collect signup form data into a map
+                        
                         final Map<String, String> signupData = {
                           "full_name": nameController.text,
                           "password": passwordController.text,
                           "phone_number": phoneController.text,
-                          "dob": dobController
-                              .text, // Make sure this is in YYYY-MM-DD
+                          "dob": dobController.text,
                           "gender": selectedGender ?? "",
                           "height": heightController.text,
                           "weight": weightController.text,
                           "city": cityController.text,
                         };
 
-                        // Pass signupData to QuestionnaireScreen
                         Navigator.push(
                           context,
                           MaterialPageRoute(

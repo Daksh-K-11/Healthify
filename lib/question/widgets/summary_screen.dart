@@ -1,5 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:healthify/auth/pages/login.dart';
+import 'package:healthify/auth/service/login_service.dart';
 import 'package:healthify/core/constant.dart';
 import 'package:healthify/core/utils.dart';
 import 'package:http/http.dart' as http;
@@ -158,11 +160,12 @@ class _SummaryScreenState extends State<SummaryScreen>
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         showSnackBar(context, "Sign up successful", true);
+        Navigator.of(context)
+            .push(MaterialPageRoute(builder: (ctx) => const LoginPage()));
       } else {
         showSnackBar(context, "Sign up unsuccessful", false);
       }
     } catch (e) {
-      // Handle exceptions
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Error: $e")),
       );
