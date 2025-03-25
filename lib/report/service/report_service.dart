@@ -1,11 +1,10 @@
 import 'dart:convert';
-
+import 'package:markdown/markdown.dart' as md;
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:healthify/core/constant.dart';
 import 'package:http/http.dart' as http;
-import 'package:pdf/pdf.dart';
 import 'package:printing/printing.dart';
 import 'package:pdf/widgets.dart' as pw;
 
@@ -57,16 +56,27 @@ final healthReportProvider = FutureProvider<String>((ref) async {
   }
 });
 
+
+
 Future<void> _downloadPdf(String report) async {
   final pdf = pw.Document();
+
+  final plainTextReport = md.markdownToHtml(report);
+  final document = md.Document();
+  final nodes = document.parseInline(report);
+  final plainText = nodes.map((e) => e.textContent).join(' ');
+
   pdf.addPage(
     pw.Page(
       build: (pw.Context context) => pw.Padding(
         padding: const pw.EdgeInsets.all(16),
-        child: pw.Text(report),
+        child: pw.Text(plainText, style: const pw.TextStyle(fontSize: 14)),
       ),
     ),
   );
+
   await Printing.sharePdf(
-      bytes: await pdf.save(), filename: "health_report.pdf");
+    bytes: await pdf.save(),
+    filename: "health_report.pdf",
+  );
 }

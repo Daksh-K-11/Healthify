@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:healthify/auth/pages/login.dart';
-import 'package:healthify/core/pages/main_scaffold.dart';
 import 'package:healthify/core/theme/theme.dart';
 
 void main() {
