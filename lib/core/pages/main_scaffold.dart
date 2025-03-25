@@ -39,7 +39,6 @@ class _MainScaffoldState extends State<MainScaffold> {
           BottomNavigationBarItem(
             icon: Icon(CupertinoIcons.profile_circled),
             label: 'Profile',
-            // activeIcon: Icon(CupertinoIcons.)
           ),
         ],
       ),
