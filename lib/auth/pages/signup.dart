@@ -15,8 +15,6 @@ class SignupPage extends ConsumerStatefulWidget {
 }
 
 class _SignupPageState extends ConsumerState<SignupPage> {
-
-  
   final nameController = TextEditingController();
   final phoneController = TextEditingController();
   final passwordController = TextEditingController();
@@ -105,6 +103,14 @@ class _SignupPageState extends ConsumerState<SignupPage> {
                     controller: nameController,
                   ),
                   const SizedBox(height: 15),
+                  Container(
+                    decoration: BoxDecoration(
+                      border: Border.all(width: 3, color: Pallete.borderColor),
+                      borderRadius: BorderRadius.circular(7),
+                    ),
+                    height: 75,
+                  ),
+                  const SizedBox(height: 15),
                   CustomField(
                     hintText: 'Phone Number',
                     controller: phoneController,
@@ -191,7 +197,6 @@ class _SignupPageState extends ConsumerState<SignupPage> {
                     buttonText: 'Sign Up',
                     onTap: () async {
                       if (formKey.currentState!.validate()) {
-                        
                         final Map<String, String> signupData = {
                           "full_name": nameController.text,
                           "password": passwordController.text,

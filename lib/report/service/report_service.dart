@@ -21,7 +21,9 @@ void showEvaluationBottomSheet(String report, BuildContext context) {
           children: [
             Expanded(
               child: Markdown(
-                data: report,
+                data: """$report 
+                    
+                     This report is generated based on available data and may not be fully accurate. Please consult a healthcare professional for a comprehensive evaluation """,
                 controller: scrollController,
               ),
             ),
@@ -40,7 +42,10 @@ void showEvaluationBottomSheet(String report, BuildContext context) {
                 ),
               ),
               onPressed: () async {
-                await _downloadPdf(report);
+                await _downloadPdf("""$report
+                
+                This report is generated based on available data and may not be fully accurate. Please consult a healthcare professional for a comprehensive evaluation
+                """);
               },
               icon: const Icon(Icons.picture_as_pdf),
               label: const Text("Download PDF"),
