@@ -1,7 +1,7 @@
 class DailyConsumption {
-  final int id;
-  final int trackItem;
-  final String trackItemName;
+  final int? id;
+  final int? trackItem;
+  final String? trackItemName;
   final String date;
   final int? units;
 
@@ -15,11 +15,13 @@ class DailyConsumption {
 
   factory DailyConsumption.fromJson(Map<String, dynamic> json) {
     return DailyConsumption(
-      id: json['id'],
-      trackItem: json['track_item'],
-      trackItemName: json['track_item_name'],
+      id: json['id'] ?? 0,
+      trackItem: json['track_item'] ?? 0,
+      trackItemName: json['track_item_name'] ?? 0,
       date: json['date'],
-      units: json['units'],
+       units: json['units'] != null 
+          ? int.tryParse(json['units'].toString()) ?? 0 
+          : 0,
     );
   }
 

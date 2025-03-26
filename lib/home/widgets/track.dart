@@ -102,8 +102,7 @@ class _TrackState extends ConsumerState<Track>
       tag: 'add_track_button',
       child: TextButton.icon(
         style: TextButton.styleFrom().copyWith(
-          foregroundColor: WidgetStateProperty.all(
-              Pallete.gradient1),
+          foregroundColor: WidgetStateProperty.all(Pallete.gradient1),
         ),
         onPressed: () {
           setState(() {
@@ -303,11 +302,11 @@ class _TrackState extends ConsumerState<Track>
             trackItem: trackItemId,
             trackItemName: '',
             date: today,
-            units: null,
+            units: 0,
           ),
         );
 
-        if (todayConsumption.units == null) {
+        if (todayConsumption.units == 0) {
           return Text(
             'Not tracked today',
             style: TextStyle(
@@ -571,30 +570,36 @@ class _TrackState extends ConsumerState<Track>
   }
 
   void _quickAddUnit(TrackItem item) {
-    final today = DateFormat('yyyy-MM-dd').format(DateTime.now());
+    try {
+      final today = DateFormat('yyyy-MM-dd').format(DateTime.now());
 
-    final dailyConsumption = ref.read(dailyConsumptionProvider);
-    int currentUnits = 0;
+      final dailyConsumption = ref.read(dailyConsumptionProvider);
+      int currentUnits = 0;
 
-    if (dailyConsumption is AsyncData) {
-      final todayConsumption = dailyConsumption.value!.firstWhere(
-        (c) => c.trackItem == item.id && c.date == today,
-        orElse: () => DailyConsumption(
-          id: 0,
-          trackItem: item.id,
-          trackItemName: item.name,
-          date: today,
-          units: 0,
-        ),
-      );
-
-      currentUnits = todayConsumption.units ?? 0;
-    }
-
-    ref.read(dailyConsumptionProvider.notifier).recordConsumption(
-          item.id,
-          today,
-          currentUnits + 1,
+      if (dailyConsumption is AsyncData) {
+        final todayConsumption = dailyConsumption.value!.firstWhere(
+          (c) => c.trackItem == item.id && c.date == today,
+          orElse: () => DailyConsumption(
+            id: 0,
+            trackItem: item.id,
+            trackItemName: item.name,
+            date: today,
+            units: 0,
+          ),
         );
+
+        currentUnits = todayConsumption.units!;
+      }
+
+      ref.read(dailyConsumptionProvider.notifier).recordConsumption(
+            item.id,
+            today,
+            currentUnits + 1,
+          );
+
+      ref.watch(dailyConsumptionProvider);
+    } catch (e) {
+      print("Error in quick add: $e");
+    }
   }
 }
