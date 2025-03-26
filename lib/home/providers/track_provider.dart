@@ -90,16 +90,13 @@ class DailyConsumptionNotifier extends AsyncNotifier<List<DailyConsumption>> {
       final newConsumption = await trackService.recordConsumption(trackItemId, date, units);
       
       state.whenData((consumptions) {
-        // Remove existing entry for this date and track item if it exists
         final filtered = consumptions.where(
           (c) => !(c.trackItem == trackItemId && c.date == date)
         ).toList();
         
-        // Add the new consumption
         state = AsyncValue.data([...filtered, newConsumption]);
       });
       
-      // Refresh weekly data
       ref.read(weeklyConsumptionProvider.notifier).fetchWeeklyConsumption(trackItemId);
     } catch (e, stackTrace) {
       state = AsyncValue.error(e, stackTrace);

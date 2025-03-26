@@ -1,4 +1,8 @@
+import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
+import 'package:file_picker/file_picker.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:healthify/auth/service/login_service.dart';
 import 'package:healthify/core/constant.dart';
@@ -32,6 +36,11 @@ class _SummaryScreenState extends State<SummaryScreen>
   Map<String, String> _summaryMapping = {};
   bool _isSubmitting = false;
 
+  bool _isProcessingDocument = false;
+  double _uploadProgress = 0.0;
+  File? _uploadedDocument;
+  Map<String, dynamic>? _extractedMedicalData;
+
   @override
   void initState() {
     super.initState();
@@ -56,6 +65,65 @@ class _SummaryScreenState extends State<SummaryScreen>
   void dispose() {
     _animationController.dispose();
     super.dispose();
+  }
+
+  Future<void> _pickAndUploadDocument() async {
+    try {
+      final result = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ['pdf'],
+      );
+
+      if (result != null) {
+        setState(() {
+          _isProcessingDocument = true;
+          _uploadProgress = 0.0;
+          _uploadedDocument = File(result.files.single.path!);
+        });
+
+        Timer.periodic(const Duration(milliseconds: 100), (timer) {
+          if (_uploadProgress >= 1.0) {
+            timer.cancel();
+          } else {
+            setState(() {
+              _uploadProgress += 0.1;
+              if (_uploadProgress > 1.0) _uploadProgress = 1.0;
+            });
+          }
+        });
+
+        var request = http.MultipartRequest(
+          'POST',
+          Uri.parse('$baseUrl/track/extract-medical-report/'),
+        );
+        // Use key 'pdf' here:
+        request.files.add(await http.MultipartFile.fromPath(
+          'pdf',
+          _uploadedDocument!.path,
+        ));
+
+        var response = await request.send();
+        var responseData = await response.stream.bytesToString();
+
+        if (response.statusCode == 200) {
+          var extractedData = jsonDecode(responseData);
+          setState(() {
+            _extractedMedicalData = extractedData;
+          });
+          showSnackBar(
+              context, 'Medical information extracted successfully', true);
+        } else {
+          showSnackBar(context, 'Failed to extract data from document', false);
+        }
+      }
+    } catch (e) {
+      showSnackBar(context, 'Error uploading document: $e', false);
+    } finally {
+      setState(() {
+        _isProcessingDocument = false;
+        _uploadProgress = 0.0;
+      });
+    }
   }
 
   void _generateSummary() {
@@ -129,7 +197,6 @@ class _SummaryScreenState extends State<SummaryScreen>
       _summary = result;
       _summaryMapping = mapping;
     });
-
   }
 
   Future<void> _submitData() async {
@@ -274,6 +341,23 @@ class _SummaryScreenState extends State<SummaryScreen>
                       ),
                     ),
                   ),
+                ),
+                const SizedBox(height: 24),
+                ElevatedButton.icon(
+                  onPressed:
+                      _isProcessingDocument ? null : _pickAndUploadDocument,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Pallete.gradient1,
+                    foregroundColor: Colors.white,
+                    minimumSize: const Size(double.infinity, 56),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  icon: _isSubmitting ? null : const Icon(CupertinoIcons.link),
+                  label: _isSubmitting
+                      ? const CircularProgressIndicator(color: Colors.white)
+                      : const Text("Upload Medical Document (Optional)"),
                 ),
                 const SizedBox(height: 24),
 

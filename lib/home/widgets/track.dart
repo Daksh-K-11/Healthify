@@ -102,8 +102,8 @@ class _TrackState extends ConsumerState<Track>
       tag: 'add_track_button',
       child: TextButton.icon(
         style: TextButton.styleFrom().copyWith(
-          foregroundColor: MaterialStateProperty.all(
-              Pallete.gradient1), // Use MaterialStateProperty.
+          foregroundColor: WidgetStateProperty.all(
+              Pallete.gradient1),
         ),
         onPressed: () {
           setState(() {
